@@ -1,33 +1,27 @@
-# The project for third-space
+# Sick Photo Editor ![Editor](https://img.shields.io/badge/Editor%F0%9F%A4%9C-%F0%9F%A4%9BHackclub-blue)
 
-Me and my team are creating a really cool photo editor with these options to edit the photos with :
+We are creating a really cool photo editor with these options to edit the photos with :
 - Geometric composition 
 - Dithering 
 - ASCII Overlay 
-- Image Tracking 
+- Image Tracking
+- & many more!! :bonezone:
 
-## What's my work?
+## Work Distribution :mise:
 
-I've taken the responsibility of designing the UI UX for the app in figma.
+@pr1hm with the backend support & image filters 
+@dorkishguy with the image filters 
+@aleeshaziz11-tech with the image filters 
+@upadhyaayy with the frontend and image filters of _CV & Mathematical Operations_
 
-## My obstacle..
 
-Today, I've started crafting the layput nad designing in figma. 
+## Languages we'll use :openbao:
+* [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+* [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+* [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+* [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
-I've found out that there's a wakatime extension for figma which allows me to track my time in figma. 
+## License
+This project is licensed under the MIT License - see the LICENSE.md file for details.
 
-I tried it. I did designing for ~2 hours. But it only counted as 10 mins. 
-
-I switched to official Wakatime extension. Used the hackatime's API keys.
-
-But it showed only the time that I spend on creating that. But, didn't specified that I was doing in figma. It calculated as a digital command language. 
-
-### What's the proof?
-
-Here'e the link of the figma file. : [Click here](https://www.figma.com/design/64lfBliFiOIXm2WtlkBUxW/thirdspace?node-id=2-2&t=sg0Ki61vjhwBJeBD-1)
-
-### Here's the image that 
-![Hackatime's proof](assets/hackatime.png)
-
-### The screenshot :
-![What I've built](assets/screenshot.png)
+Made with ❤️ for Third.space!
