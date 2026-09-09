@@ -9,9 +9,9 @@ We are creating a really cool photo editor with these options to edit the photos
 
 ## Work Distribution <img alt="copybara" src="https://buildkiteassets.com/emojis/img-buildkite-64/copybara.png" width="20"/>
 
-@pr1hm with the backend support & image filters 
-@dorkishguy with the image filters 
-@aleeshaziz11-tech with the image filters 
+@pr1hm with the backend support & image filters\
+@dorkishguy with the image filters\
+@aleeshaziz11-tech with the image filters\
 @upadhyaayy with the frontend and image filters of _CV & Mathematical Operations_
 
 
