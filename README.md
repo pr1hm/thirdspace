@@ -7,7 +7,7 @@ We are creating a really cool photo editor with these options to edit the photos
 - Image Tracking
 - & many more!! <img alt="bonezone" src="https://buildkiteassets.com/emojis/img-buildkite-64/bonezone.gif" width="20"/>
 
-## Work Distribution <img alt="mise" src="https://buildkiteassets.com/emojis/img-buildkite-64/mise.png" width="20"/>
+## Work Distribution <img alt="copybara" src="https://buildkiteassets.com/emojis/img-buildkite-64/copybara.png" width="20"/>
 
 @pr1hm with the backend support & image filters 
 @dorkishguy with the image filters 
