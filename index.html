@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sick Image Editor</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            color: #252525;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            image-rendering: pixelated;
+            background: #7b8a59;
+            background-image:
+                linear-gradient(135deg, rgba(255, 255, 255, .1) 25%, transparent 25%),
+                linear-gradient(315deg, rgba(0, 0, 0, .13) 25%, transparent 25%),
+                linear-gradient(45deg, rgba(0, 0, 0, .08) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(255, 255, 255, .08) 25%, transparent 25%);
+            background-size: 42px 42px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: rgba(34, 45, 29, .28);
+            backdrop-filter: blur(2px);
+        }
+
+        .screen {
+            position: relative;
+            width: min(1050px, calc(100% - 28px));
+            margin: 30px auto;
+            padding: 18px;
+            background: #c6c6c6;
+            border: 4px solid;
+            border-color: #ffffff #555 #555 #ffffff;
+            box-shadow: 0 10px 0 rgba(0, 0, 0, .22), inset 2px 2px 0 #eeeeee, inset -2px -2px 0 #777;
+        }
+
+        .titlebar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            margin: 1px 0 18px;
+            color: #343434;
+            text-shadow: 2px 2px #eeeeee;
+        }
+
+        h1 {
+            font-size: clamp(12px, 2vw, 18px);
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(180px, 1fr) 190px minmax(180px, 1fr);
+            align-items: center;
+            gap: 28px;
+            padding: 18px;
+            background: #bdbdbd;
+            border: 3px solid;
+            border-color: #555 #fff #fff #555;
+            box-shadow: inset 2px 2px #777, inset -2px -2px #dedede;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 10px;
+            text-shadow: 1px 1px #eee;
+        }
+
+        .preview {
+            position: relative;
+            display: grid;
+            place-items: center;
+            aspect-ratio: 1;
+            min-height: 180px;
+            background-color: #8d8d8d;
+            background-image: linear-gradient(45deg, #979797 25%, transparent 25%), linear-gradient(-45deg, #979797 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #979797 75%), linear-gradient(-45deg, transparent 75%, #979797 75%);
+            background-size: 24px 24px;
+            background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+            border: 5px solid;
+            border-color: #383838 #f5f5f5 #f5f5f5 #383838;
+            box-shadow: inset 3px 3px #555, inset -3px -3px #aaa;
+            overflow: hidden;
+        }
+
+        .preview-hint {
+            position: absolute;
+            bottom: 12px;
+            font-size: 7px;
+            color: #494949;
+        }
+
+        .output-preview {
+            background-color: #75806e;
+            filter: saturate(.7);
+        }
+
+        .source-preview {
+            cursor: pointer;
+        }
+
+        .source-preview.has-image {
+            background: #777;
+        }
+
+        .source-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: auto;
+        }
+
+        .source-preview.drag-over {
+            background-color: #9a9a68;
+        }
+
+        .filter-zone {
+            text-align: center;
+        }
+
+        .zone-title {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 9px;
+            text-shadow: 1px 1px #eee;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 68px);
+            gap: 8px;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .slot {
+            position: relative;
+            display: grid;
+            place-items: center;
+            width: 68px;
+            height: 68px;
+            padding: 4px;
+            background: #8b8b8b;
+            border: 4px solid;
+            border-color: #373737 #e8e8e8 #e8e8e8 #373737;
+            box-shadow: inset 2px 2px #5d5d5d, inset -2px -2px #bdbdbd;
+        }
+
+        .slot.drag-over {
+            background: #b9a85b;
+            box-shadow: inset 2px 2px #66591f, inset -2px -2px #ffffc0;
+        }
+
+        .slot:focus-visible,
+        .item:focus-visible {
+            outline: 3px solid #f5d25c;
+            outline-offset: 3px;
+        }
+
+        .slot .item {
+            width: 50px;
+            height: 50px;
+            cursor: grab;
+        }
+
+        .slot:empty::after {
+            content: '';
+            width: 28px;
+            height: 28px;
+            border: 2px dashed #686868;
+            opacity: .45;
+        }
+
+        .arrow {
+            display: block;
+            margin-top: 18px;
+            color: #6d6d6d;
+            font-size: 42px;
+            line-height: 1;
+            text-shadow: 2px 2px #eee, -2px -2px #555;
+        }
+
+        .filter-note {
+            margin-top: 14px;
+            font-size: 7px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .inventory {
+            margin-top: 18px;
+            padding: 16px 14px 14px;
+            background: #c6c6c6;
+            border: 4px solid;
+            border-color: #fff #555 #555 #fff;
+            box-shadow: inset 2px 2px #eee, inset -2px -2px #777;
+        }
+
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .inventory-title {
+            font-size: 10px;
+            text-shadow: 1px 1px #eee;
+        }
+
+        .inventory-count {
+            font-size: 7px;
+            color: #555;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 6px;
+            padding-bottom: 28px;
+        }
+
+        .inventory-grid> :nth-child(n+28) {
+            transform: translateY(28px);
+        }
+
+        .item {
+            position: relative;
+            display: grid;
+            place-items: center;
+            min-width: 0;
+            aspect-ratio: 1;
+            border: 3px solid;
+            border-color: #373737 #ededed #ededed #373737;
+            background: #8b8b8b;
+            box-shadow: inset 2px 2px #555, inset -2px -2px #bdbdbd;
+            cursor: grab;
+            user-select: none;
+            font-size: clamp(11px, 3vw, 9px);
+            line-height: 1;
+        }
+
+        .item:active {
+            cursor: grabbing;
+        }
+
+        .item.dragging {
+            opacity: .4;
+        }
+
+        .item:nth-child(3n) {
+            background: #898989;
+        }
+
+        .item:nth-child(4n) {
+            background: #818181;
+        }
+
+        .filter-glyph {
+            filter: drop-shadow(2px 2px #333);
+        }
+
+        .empty-row {
+            opacity: .4;
+        }
+
+        .slidercss {
+            position: fixed;
+            z-index: 4;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 9px;
+            width: 66px;
+            padding: 10px 8px;
+            background: #c6c6c6;
+            border: 3px solid;
+            border-color: #fff #444 #444 #fff;
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, .35);
+        }
+
+        .slidercss.visible {
+            display: flex;
+        }
+
+        .slidercss label {
+            font-size: 7px;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+
+        input[type=range] {
+            writing-mode: vertical-lr;
+            direction: rtl;
+            width: 24px;
+            height: 110px;
+            accent-color: #586b3c;
+            cursor: ns-resize;
+        }
+
+        .intensityval {
+            font-size: 7px;
+        }
+
+        @media (max-width: 720px) {
+            .screen {
+                margin: 12px auto;
+                padding: 10px;
+            }
+
+            .workspace {
+                grid-template-columns: 1fr;
+                gap: 18px;
+                padding: 12px;
+            }
+
+            .preview {
+                min-height: 160px;
+                max-width: 330px;
+                margin: 0 auto;
+            }
+
+            .filter-zone {
+                order: 3;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+                margin: 4px 0;
+            }
+
+            .inventory-grid {
+                gap: 4px;
+            }
+
+            .inventory-grid {
+                padding-bottom: 20px;
+            }
+
+            .inventory-grid> :nth-child(n+28) {
+                transform: translateY(20px);
+            }
+
+            .inventory {
+                padding: 12px 8px 10px;
+            }
+
+            .item {
+                border-width: 2px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="screen">
+        <header class="titlebar">
+            <h1>Sick Image Editor!!</h1>
+        </header>
+
+        <section class="workspace" aria-label="Image filter workspace">
+            <input id="imageInput" type="file" accept="image/*" hidden>
+            <div class="preview source-preview" id="sourcePreview" aria-label="Drag the image or click to load an image"
+                tabindex="0" role="button">
+                <span class="preview-hint">DRAG OR CLICK TO LOAD AN IMG</span>
+            </div>
+
+            <div class="filter-zone">
+                <div class="filter-grid" id="filterGrid" aria-label="Drop filters here">
+                    <div class="slot" tabindex="0" aria-label="Filter slot 1"></div>
+                    <div class="slot" tabindex="0" aria-label="Filter slot 2"></div>
+                    <div class="slot" tabindex="0" aria-label="Filter slot 3"></div>
+                    <div class="slot" tabindex="0" aria-label="Filter slot 4"></div>
+                </div>
+                <span class="arrow" aria-hidden="true">➜</span>
+            </div>
+
+            <div class="preview output-preview" aria-label="Final output image preview">
+            </div>
+        </section>
+
+        <section class="inventory" aria-label="Filter inventory">
+            <div class="inventory-grid" id="inventoryGrid">
+                <div class="item" draggable="true" tabindex="0" data-filter="Sample" title="Sample">Sample</div>
+                <div class="item" draggable="true" tabindex="0" data-filter="Sample" title="Sample">Sample</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+                <div class="item empty-row" aria-hidden="true">·</div>
+            </div>
+        </section>
+    </main>
+
+    <aside class="slidercss" id="slider" aria-label="Filter intensity">
+        <label for="intensity">INTENSITY</label>
+        <input id="intensity" type="range" min="0" max="100" value="75">
+        <span class="intensityval" id="intensityValue">75%</span>
+    </aside>
+
+    <script>
+        const slots = document.querySelectorAll('.slot');
+        const inventory = document.querySelectorAll('.inventory-grid .item[draggable]');
+        const slider = document.getElementById('slider');
+        const intensity = document.getElementById('intensity');
+        const intensityValue = document.getElementById('intensityValue');
+        const imageInput = document.getElementById('imageInput');
+        const sourcePreview = document.getElementById('sourcePreview');
+        let draggedItem = null;
+        let draggedFromSlot = null;
+        let dragCompleted = false;
+        let draggedSourceImage = null;
+        let sourceImageDragCompleted = false;
+        let sourceImageUrl = null;
+
+        function announce(message) {
+            return message;
+        }
+
+        function hideSlider() {
+            slider.classList.remove('visible');
+            slider.removeAttribute('data-slot');
+        }
+
+        function showSlider(slot) {
+            const bounds = slot.getBoundingClientRect();
+            slider.style.left = `${Math.min(window.innerWidth - 76, bounds.right + 8)}px`;
+            slider.style.top = `${Math.max(8, bounds.top + bounds.height / 2 - 75)}px`;
+            slider.dataset.slot = slot.getAttribute('aria-label');
+            slider.classList.add('visible');
+            intensity.focus();
+        }
+
+        function placeItem(item, slot) {
+            const placed = item.cloneNode(true);
+            placed.classList.remove('dragging');
+            placed.setAttribute('draggable', 'true');
+            placed.style.cursor = 'grab';
+            placed.setAttribute('aria-label', `${item.dataset.filter} filter, double-click to adjust intensity`);
+            slot.replaceChildren(placed);
+            addDragHandlers(placed);
+            announce(`${item.dataset.filter} equipped`);
+            return placed;
+        }
+
+        function addDragHandlers(item) {
+            item.setAttribute('draggable', 'true');
+            item.addEventListener('dragstart', event => {
+                draggedItem = item;
+                draggedFromSlot = item.closest('.slot');
+                dragCompleted = false;
+                item.classList.add('dragging');
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', item.dataset.filter);
+            });
+            item.addEventListener('dragend', () => {
+                item.classList.remove('dragging');
+                if (draggedFromSlot && !dragCompleted && item.parentElement) {
+                    item.remove();
+                }
+                draggedItem = null;
+                draggedFromSlot = null;
+                dragCompleted = false;
+            });
+        }
+
+        function loadSourceImage(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                announce('Please choose an image');
+                return;
+            }
+            if (sourceImageUrl) URL.revokeObjectURL(sourceImageUrl);
+            sourceImageUrl = URL.createObjectURL(file);
+            sourcePreview.classList.add('has-image');
+            sourcePreview.replaceChildren();
+            const image = document.createElement('img');
+            image.src = sourceImageUrl;
+            image.alt = 'Loaded source image';
+            image.draggable = true;
+            image.addEventListener('click', event => event.stopPropagation());
+            image.addEventListener('dragstart', event => {
+                draggedSourceImage = image;
+                sourceImageDragCompleted = false;
+                event.dataTransfer.effectAllowed = 'move';
+                event.dataTransfer.setData('text/plain', 'source-image');
+            });
+            image.addEventListener('dragend', () => {
+                if (!sourceImageDragCompleted && draggedSourceImage === image) clearSourceImage();
+                draggedSourceImage = null;
+                sourceImageDragCompleted = false;
+            });
+            sourcePreview.append(image);
+            announce('Image loaded');
+        }
+
+        function clearSourceImage() {
+            if (sourceImageUrl) URL.revokeObjectURL(sourceImageUrl);
+            sourceImageUrl = null;
+            sourcePreview.classList.remove('has-image');
+            sourcePreview.replaceChildren(
+                Object.assign(document.createElement('span'), { className: 'preview-hint', textContent: 'DRAG IMAGE OR CLICK TO LOAD AN IMG' })
+            );
+        }
+
+        sourcePreview.addEventListener('click', () => imageInput.click());
+        sourcePreview.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                imageInput.click();
+            }
+        });
+        imageInput.addEventListener('change', event => loadSourceImage(event.target.files[0]));
+        sourcePreview.addEventListener('dragover', event => {
+            event.preventDefault();
+            sourcePreview.classList.add('drag-over');
+        });
+        sourcePreview.addEventListener('dragleave', () => sourcePreview.classList.remove('drag-over'));
+        sourcePreview.addEventListener('drop', event => {
+            event.preventDefault();
+            sourcePreview.classList.remove('drag-over');
+            if (draggedSourceImage) {
+                sourceImageDragCompleted = true;
+                return;
+            }
+            loadSourceImage(event.dataTransfer.files[0]);
+        });
+
+        inventory.forEach(item => {
+            addDragHandlers(item);
+            item.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    const emptySlot = [...slots].find(slot => !slot.firstElementChild);
+                    if (emptySlot) placeItem(item, emptySlot);
+                }
+            });
+        });
+
+        slots.forEach(slot => {
+            slot.addEventListener('dragover', event => {
+                event.preventDefault();
+                slot.classList.add('drag-over');
+            });
+            slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+            slot.addEventListener('drop', event => {
+                event.preventDefault();
+                slot.classList.remove('drag-over');
+                if (draggedItem) {
+                    dragCompleted = true;
+                    const item = draggedItem;
+                    if (draggedFromSlot) item.remove();
+                    placeItem(item, slot);
+                }
+            });
+            slot.addEventListener('dblclick', event => {
+                if (event.target.closest('.item')) showSlider(slot);
+            });
+        });
+
+        document.addEventListener('dragover', event => {
+            if (draggedFromSlot && !event.target.closest('.filter-grid')) event.preventDefault();
+            if (draggedSourceImage && !event.target.closest('#sourcePreview')) event.preventDefault();
+        });
+        document.addEventListener('drop', event => {
+            if (draggedFromSlot && !event.target.closest('.filter-grid')) {
+                event.preventDefault();
+                draggedItem.remove();
+                dragCompleted = true;
+            }
+            if (draggedSourceImage && !event.target.closest('#sourcePreview')) {
+                event.preventDefault();
+                clearSourceImage();
+                sourceImageDragCompleted = true;
+            }
+        });
+
+        intensity.addEventListener('input', () => {
+            intensityValue.textContent = `${intensity.value}%`;
+            const selectedSlot = [...slots].find(slot => slot.getAttribute('aria-label') === slider.dataset.slot);
+            const placed = selectedSlot?.querySelector('.item');
+            if (placed) placed.style.opacity = intensity.value / 100;
+        });
+
+        document.addEventListener('click', event => {
+            if (!event.target.closest('.slidercss') && !event.target.closest('.slot .item')) hideSlider();
+        });
+        window.addEventListener('resize', hideSlider);
+    </script>
+</body>
+
+</html>
