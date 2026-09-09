@@ -5,9 +5,9 @@ We are creating a really cool photo editor with these options to edit the photos
 - Dithering 
 - ASCII Overlay 
 - Image Tracking
-- & many more!! :bonezone:
+- & many more!! <img alt="bonezone" src="https://buildkiteassets.com/emojis/img-buildkite-64/bonezone.gif" />
 
-## Work Distribution :mise:
+## Work Distribution <img alt="mise" src="https://buildkiteassets.com/emojis/img-buildkite-64/mise.png" />
 
 @pr1hm with the backend support & image filters 
 @dorkishguy with the image filters 
@@ -15,7 +15,7 @@ We are creating a really cool photo editor with these options to edit the photos
 @upadhyaayy with the frontend and image filters of _CV & Mathematical Operations_
 
 
-## Languages we'll use :openbao:
+## Languages we'll use <img alt="openbao" src="https://buildkiteassets.com/emojis/img-buildkite-64/openbao.png" />
 * [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
 * [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 * [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
