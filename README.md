@@ -21,6 +21,17 @@ We are creating a really cool photo editor with these options to edit the photos
 * [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 * [![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
+
+## Some installation commads
+```
+python -m http.server 5500
+python -m uvicorn main:app --reload --port 8000
+```
+
+locate: http://127.0.0.1:8000/inventory
+locate: http://127.0.0.1:5500/index.html
+
+
 ## License
 This project is licensed under the MIT License - see the LICENSE.md file for details.
 

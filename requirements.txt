@@ -1,3 +1,5 @@
 uvicorn
 pillow
 numpy
+python-multipart
+fastapi
