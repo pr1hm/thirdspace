@@ -221,7 +221,7 @@ async function loadInventory() {
             item.title = filter.description;
             item.textContent = filter.name;
             inventory.append(item);
-            inventory(item);
+            inventoryfn(item);
         });
     } catch (error) {
         announce(error.message);
@@ -229,7 +229,7 @@ async function loadInventory() {
     }
 }
 
-function inventory(item) {
+function inventoryfn(item) {
     addDragHandlers(item);
     item.addEventListener('keydown', event => {
         if (event.key === 'Enter' || event.key === ' ') {
