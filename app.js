@@ -366,5 +366,5 @@ document.addEventListener('click', event => {
     if (!event.target.closest('.slidercss') && !event.target.closest('.slot .item')) hideSlider();
 });
 window.addEventListener('resize', hideSlider);
-inventory.querySelectorAll('.item[draggable]').forEach(inventory);
+inventoryfn.querySelectorAll('.item[draggable]').forEach(inventory);
 loadInventory();
