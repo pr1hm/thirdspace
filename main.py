@@ -1,7 +1,4 @@
-"""FastAPI image editor with dynamically discovered filter plugins."""
-
 from __future__ import annotations
-
 import importlib.util
 import inspect
 import io
@@ -9,7 +6,6 @@ import json
 from pathlib import Path
 from types import ModuleType
 from typing import Any
-
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -29,7 +25,6 @@ app.add_middleware(
 
 
 def discover_filters() -> dict[str, dict[str, Any]]:
-    """Load filter modules that expose a callable ``process`` function."""
     discovered: dict[str, dict[str, Any]] = {}
     FILTERS_DIR.mkdir(exist_ok=True)
 
@@ -67,7 +62,6 @@ def discover_filters() -> dict[str, dict[str, Any]]:
 
 
 def parse_filter_sequence(raw_filters: str) -> list[dict[str, Any]]:
-    """Decode and validate the filter sequence sent by the browser."""
     try:
         filters = json.loads(raw_filters)
     except json.JSONDecodeError as exc:
@@ -123,7 +117,6 @@ async def process_image(
     image: UploadFile = File(...),
     filters: str = Form("[]"),
 ) -> StreamingResponse:
-    """Apply the selected plugins sequentially and return a PNG image."""
     try:
         source = Image.open(io.BytesIO(await image.read())).convert("RGBA")
     except (UnidentifiedImageError, OSError) as exc:
