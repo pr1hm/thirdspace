@@ -1,15 +1,3 @@
-# Pages / Sections
-
-- [ ] Home (dashboard) - 
-- [ ] Templates (dashboard) - 
-- [ ] Projects (dashboard) - 
-- [ ] Notifications (popup)
-- [ ] Account (popup / page)
-- [ ] Settings (popup / page)
-- [ ] Community (dashboard) -
-- [ ] Other / More options
-- [ ] Trash (popup / page)
-
 
 # Image editing 
 
@@ -28,3 +16,16 @@ https://artkit.cc/image-track/
 
 # IG Reel for reference : 
 https://www.instagram.com/reel/DaqYkBwS1fc/?igsi=M2Nwa256dTJlZTIw
+
+
+# Pages / Sections
+
+- [ ] Home (dashboard) - 
+- [ ] Templates (dashboard) - 
+- [ ] Projects (dashboard) - 
+- [ ] Notifications (popup)
+- [ ] Account (popup / page)
+- [ ] Settings (popup / page)
+- [ ] Community (dashboard) -
+- [ ] Other / More options
+- [ ] Trash (popup / page)
