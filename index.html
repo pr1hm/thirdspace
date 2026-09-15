@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sick Image Editor</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-    <script src="app.js"></script>
+    
     <style>
         * {
             box-sizing: border-box;
@@ -500,7 +500,7 @@
                 <span class="arrow" aria-hidden="true">➜</span>
             </div>
 
-            <div class="preview output-preview" aria-label="Final output image preview">
+            <div class="preview output-preview" aria-label="Final output image preview" id="outputpre">
                 <button class="preview-control save-control" id="saveButton" type="button" disabled
                     aria-label="Save output" title="Save">SAVE</button>
                 <span class="processing-status" id="processingStatus">hol\' up...</span>
@@ -545,6 +545,7 @@
         <input id="intensity" type="range" min="0" max="100" value="75">
         <span class="intensityval" id="intensityval">75%</span>
     </aside>
+    <script src="app.js"></script>
 </body>
 
 
