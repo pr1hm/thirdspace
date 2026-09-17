@@ -3,6 +3,7 @@ import importlib.util
 import inspect
 import io
 import json
+import sys
 from pathlib import Path
 from types import ModuleType
 from typing import Any
@@ -13,6 +14,9 @@ from PIL import Image, UnidentifiedImageError
 
 BASE_DIR = Path(__file__).resolve().parent
 FILTERS_DIR = BASE_DIR / "filters"
+
+if str(FILTERS_DIR) not in sys.path:
+    sys.path.insert(0, str(FILTERS_DIR))
 
 app = FastAPI(title="Image Editor API")
 app.add_middleware(
@@ -27,27 +31,22 @@ app.add_middleware(
 def discover_filters() -> dict[str, dict[str, Any]]:
     discovered: dict[str, dict[str, Any]] = {}
     FILTERS_DIR.mkdir(exist_ok=True)
-
     for path in sorted(FILTERS_DIR.glob("*.py")):
         if path.name.startswith("_"):
             continue
-
         module_name = f"image_editor_filter_{path.stem}"
         spec = importlib.util.spec_from_file_location(module_name, path)
         if spec is None or spec.loader is None:
             continue
-
         module = importlib.util.module_from_spec(spec)
         try:
             spec.loader.exec_module(module)
         except Exception as exc:
             print(f"Warning: could not load filter '{path.name}': {exc}")
             continue
-
         process = getattr(module, "process", None)
         if not callable(process):
             continue
-
         filter_name = str(getattr(module, "NAME", path.stem))
         discovered[filter_name] = {
             "name": filter_name,
@@ -57,7 +56,6 @@ def discover_filters() -> dict[str, dict[str, Any]]:
             "process": process,
             "module": module,
         }
-
     return discovered
 
 
@@ -66,10 +64,8 @@ def parse_filter_sequence(raw_filters: str) -> list[dict[str, Any]]:
         filters = json.loads(raw_filters)
     except json.JSONDecodeError as exc:
         raise HTTPException(status_code=400, detail="filters must be valid JSON") from exc
-
     if not isinstance(filters, list):
         raise HTTPException(status_code=400, detail="filters must be a JSON array")
-
     validated: list[dict[str, Any]] = []
     for item in filters:
         if not isinstance(item, dict) or not isinstance(item.get("name"), str):
@@ -94,18 +90,16 @@ def parse_filter_sequence(raw_filters: str) -> list[dict[str, Any]]:
 
 
 def call_plugin(process: Any, image: Image.Image, intensity: float) -> Image.Image:
-    """Call a plugin while supporting the documented intensity contract."""
     result = process(image, intensity=intensity)
     if inspect.isawaitable(result):
-        raise TypeError("async filter plugins are not supported; use a sync process()")
+        raise TypeError("Invalid")
     if not isinstance(result, Image.Image):
-        raise TypeError("filter process() must return a PIL.Image.Image")
+        raise TypeError("Invalid")
     return result
 
 
 @app.get("/inventory")
 def inventory() -> list[dict[str, str]]:
-    """Return metadata for every valid filter currently in ``filters/``."""
     return [
         {"name": item["name"], "description": item["description"]}
         for item in discover_filters().values()
@@ -121,10 +115,8 @@ async def process_image(
         source = Image.open(io.BytesIO(await image.read())).convert("RGBA")
     except (UnidentifiedImageError, OSError) as exc:
         raise HTTPException(status_code=400, detail="uploaded file is not a valid image") from exc
-
     selected_filters = parse_filter_sequence(filters)
     available_filters = discover_filters()
-
     for selected in selected_filters:
         plugin = available_filters.get(selected["name"])
         if plugin is None:
