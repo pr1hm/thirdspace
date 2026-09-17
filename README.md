@@ -24,12 +24,10 @@ We are creating a really cool photo editor with these options to edit the photos
 
 ## Some installation commads
 ```
-python -m http.server 5500
 python -m uvicorn main:app --reload --port 8000
 ```
 
-locate: http://127.0.0.1:8000/inventory
-locate: http://127.0.0.1:5500/index.html
+Go to : `http://127.0.0.1:8000/`
 
 
 ## License
