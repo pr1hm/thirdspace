@@ -11,6 +11,7 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from PIL import Image, UnidentifiedImageError
+from fastapi.staticfiles import StaticFiles
 
 BASE_DIR = Path(__file__).resolve().parent
 FILTERS_DIR = BASE_DIR / "filters"
@@ -136,3 +137,5 @@ async def process_image(
     source.convert("RGBA").save(output, format="PNG")
     output.seek(0)
     return StreamingResponse(output, media_type="image/png")
+
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
