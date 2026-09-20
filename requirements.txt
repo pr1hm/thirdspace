@@ -3,3 +3,4 @@ pillow
 numpy
 python-multipart
 fastapi
+pilgram2
